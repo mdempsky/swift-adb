@@ -1,0 +1,26 @@
+name: SwiftADB
+options:
+  bundleIdPrefix: soy.mdempsky
+  deploymentTarget:
+    iOS: "16.0"
+
+packages:
+  ADB:
+    path: .
+
+targets:
+  SwiftADB:
+    type: application
+    platform: iOS
+    sources:
+      - Sources/App
+    dependencies:
+      - package: ADB
+        product: ADB
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: soy.mdempsky.SwiftADB
+        INFOPLIST_FILE: Sources/App/Info.plist
+        SWIFT_VERSION: 5.9
+        DEVELOPMENT_TEAM: 7QU9C62CVX
+        CODE_SIGN_STYLE: Automatic
