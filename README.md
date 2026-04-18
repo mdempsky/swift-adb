@@ -112,4 +112,4 @@ For iOS Keychain storage, see the example in `Sources/App/ADB/KeychainAuth.swift
 
 ## License
 
-MIT
+Public domain — see [Unlicense](https://unlicense.org).
