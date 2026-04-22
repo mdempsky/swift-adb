@@ -3,6 +3,7 @@ options:
   bundleIdPrefix: soy.mdempsky
   deploymentTarget:
     iOS: "16.0"
+    macOS: "13.0"
 
 packages:
   ADB:
@@ -24,3 +25,21 @@ targets:
         SWIFT_VERSION: 5.9
         DEVELOPMENT_TEAM: 7QU9C62CVX
         CODE_SIGN_STYLE: Automatic
+
+  AndroidScreenshot:
+    type: application
+    platform: macOS
+    sources:
+      - Sources/ScreenshotApp
+    dependencies:
+      - package: ADB
+        product: ADB
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: soy.mdempsky.AndroidScreenshot
+        INFOPLIST_FILE: Sources/ScreenshotApp/Info.plist
+        SWIFT_VERSION: 5.9
+        DEVELOPMENT_TEAM: 7QU9C62CVX
+        CODE_SIGN_STYLE: Automatic
+        MACOSX_DEPLOYMENT_TARGET: "13.0"
+        ENABLE_HARDENED_RUNTIME: YES

@@ -13,11 +13,21 @@
 		39FF81AE1A061D8801B29ADD /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0101CC435F68EE8645111EE /* ContentView.swift */; };
 		513B66DCF70DDFA639A40218 /* SwiftADBApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7169ED52AD6C3735A3097B44 /* SwiftADBApp.swift */; };
 		5373F2295E07732A711F69B1 /* ScreencastSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 514D78292DC5D955A86E886E /* ScreencastSession.swift */; };
+		590564DBE29AFCE6197A98CB /* AddDeviceSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84B966F7BC65BF3E7027BD49 /* AddDeviceSheet.swift */; };
+		6229EB58CD6639E3F9C366C8 /* ScreenshotApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DD24FED435CC93CA576FFA0 /* ScreenshotApp.swift */; };
+		6894E6F710FCC7C1034AEA44 /* AuthApprovalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95080AA33944EB8A01C8CC14 /* AuthApprovalView.swift */; };
+		71EACDC567CAC6D04B954CF5 /* DeviceListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA0717003808FB459385C3F2 /* DeviceListView.swift */; };
+		72727156069944055711496A /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B5849A5A6920FDA1AA035C0 /* ContentView.swift */; };
+		8D6468EF2ECB63684502D87F /* DeviceDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7DFE05D750F934A43C30A04 /* DeviceDetailView.swift */; };
+		90F9935A0CE0DAD4CD544114 /* ADB in Frameworks */ = {isa = PBXBuildFile; productRef = 4540490BDD5EE986531AB516 /* ADB */; };
 		B16F7D630472A839AFA2B695 /* DeviceDiscovery.swift in Sources */ = {isa = PBXBuildFile; fileRef = 310AF6D267B16BFDED128C46 /* DeviceDiscovery.swift */; };
 		B942096B5394E79E02761F8C /* ADBConnection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A9F1BB546E1C05E753901D8 /* ADBConnection.swift */; };
+		C3DB3A0B0E28B5BA93057DD5 /* ConnectionModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 453D0CB5974B6FD2CA86C260 /* ConnectionModel.swift */; };
 		CA36853536B10D68033FA2C0 /* SavedDevices.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB1312E31A763730D83E2494 /* SavedDevices.swift */; };
+		CECEE7022CE81E9AE99FF6B4 /* DeviceStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2BF4ABD89B6291445CB360FB /* DeviceStore.swift */; };
 		D3B1FFBCD3A597365B3E4B44 /* ScreencastView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 23B1CAD7FDDA4964B8EFB0E7 /* ScreencastView.swift */; };
 		D4B95306AB01F28C723E3F08 /* ADBMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE2631C9F502F97FFDCAC944 /* ADBMessage.swift */; };
+		DA8F9492A25E493641171A57 /* KeychainAuth.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB66D5CD8EBCB7E3B4380665 /* KeychainAuth.swift */; };
 		E59FC05B0AEA9409908070D9 /* ADBAuthPromptView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7FB09D9FE1E3CC0A7368B6C /* ADBAuthPromptView.swift */; };
 		E6BE7A0A9E9E9CBF48BE57A5 /* APKInstaller.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4DFBD68FDB2FD569A7A5943 /* APKInstaller.swift */; };
 		F10B693A5CAADCB8CA45DB5D /* ADB in Frameworks */ = {isa = PBXBuildFile; productRef = 2F3FA09CABBF9694F13D2959 /* ADB */; };
@@ -25,26 +35,45 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		0B5849A5A6920FDA1AA035C0 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		0D13CF1431B754272BEEE755 /* KeychainAuth.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainAuth.swift; sourceTree = "<group>"; };
 		1A25B2AA3871B7BCE845AD3A /* ADBAuth.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ADBAuth.swift; sourceTree = "<group>"; };
 		23B1CAD7FDDA4964B8EFB0E7 /* ScreencastView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreencastView.swift; sourceTree = "<group>"; };
+		24F26A058E73A558A0887627 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		2BF4ABD89B6291445CB360FB /* DeviceStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceStore.swift; sourceTree = "<group>"; };
 		310AF6D267B16BFDED128C46 /* DeviceDiscovery.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceDiscovery.swift; sourceTree = "<group>"; };
 		34E2498051CC1D1CE8420AE1 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		3A9F1BB546E1C05E753901D8 /* ADBConnection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ADBConnection.swift; sourceTree = "<group>"; };
+		453D0CB5974B6FD2CA86C260 /* ConnectionModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectionModel.swift; sourceTree = "<group>"; };
 		514D78292DC5D955A86E886E /* ScreencastSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreencastSession.swift; sourceTree = "<group>"; };
 		52B873AFF844336DD548B129 /* ADBStream.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ADBStream.swift; sourceTree = "<group>"; };
+		5AECD35CBC9478E2E4AE675F /* AndroidScreenshot.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AndroidScreenshot.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		6DD24FED435CC93CA576FFA0 /* ScreenshotApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenshotApp.swift; sourceTree = "<group>"; };
 		7169ED52AD6C3735A3097B44 /* SwiftADBApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftADBApp.swift; sourceTree = "<group>"; };
 		813F75D9B78D23D005A41F64 /* SwiftADB.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = SwiftADB.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		84B966F7BC65BF3E7027BD49 /* AddDeviceSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddDeviceSheet.swift; sourceTree = "<group>"; };
+		95080AA33944EB8A01C8CC14 /* AuthApprovalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthApprovalView.swift; sourceTree = "<group>"; };
+		AB66D5CD8EBCB7E3B4380665 /* KeychainAuth.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainAuth.swift; sourceTree = "<group>"; };
 		B0101CC435F68EE8645111EE /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		B9B0F806EA1D8EC9BA378D0F /* DevicePickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevicePickerView.swift; sourceTree = "<group>"; };
 		C4DFBD68FDB2FD569A7A5943 /* APKInstaller.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APKInstaller.swift; sourceTree = "<group>"; };
+		D7DFE05D750F934A43C30A04 /* DeviceDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceDetailView.swift; sourceTree = "<group>"; };
 		DE2631C9F502F97FFDCAC944 /* ADBMessage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ADBMessage.swift; sourceTree = "<group>"; };
 		E7FB09D9FE1E3CC0A7368B6C /* ADBAuthPromptView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ADBAuthPromptView.swift; sourceTree = "<group>"; };
+		EA0717003808FB459385C3F2 /* DeviceListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceListView.swift; sourceTree = "<group>"; };
 		F1C996DBC9470E45E9B10019 /* swift-adb */ = {isa = PBXFileReference; lastKnownFileType = folder; name = "swift-adb"; path = .; sourceTree = SOURCE_ROOT; };
 		FB1312E31A763730D83E2494 /* SavedDevices.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavedDevices.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		35AD8A7039AA1179F2B79A3C /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				90F9935A0CE0DAD4CD544114 /* ADB in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		F184CE0F11420A6ADACBCCA5 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -74,6 +103,24 @@
 			path = Sources/App;
 			sourceTree = "<group>";
 		};
+		3CE8B7788637407BBD5CE7E9 /* ScreenshotApp */ = {
+			isa = PBXGroup;
+			children = (
+				84B966F7BC65BF3E7027BD49 /* AddDeviceSheet.swift */,
+				95080AA33944EB8A01C8CC14 /* AuthApprovalView.swift */,
+				453D0CB5974B6FD2CA86C260 /* ConnectionModel.swift */,
+				0B5849A5A6920FDA1AA035C0 /* ContentView.swift */,
+				D7DFE05D750F934A43C30A04 /* DeviceDetailView.swift */,
+				EA0717003808FB459385C3F2 /* DeviceListView.swift */,
+				2BF4ABD89B6291445CB360FB /* DeviceStore.swift */,
+				24F26A058E73A558A0887627 /* Info.plist */,
+				AB66D5CD8EBCB7E3B4380665 /* KeychainAuth.swift */,
+				6DD24FED435CC93CA576FFA0 /* ScreenshotApp.swift */,
+			);
+			name = ScreenshotApp;
+			path = Sources/ScreenshotApp;
+			sourceTree = "<group>";
+		};
 		9911A486EEEF79F6B6D07BDB /* ADB */ = {
 			isa = PBXGroup;
 			children = (
@@ -90,6 +137,7 @@
 		B072A11F3D4C37553EE878EB /* Products */ = {
 			isa = PBXGroup;
 			children = (
+				5AECD35CBC9478E2E4AE675F /* AndroidScreenshot.app */,
 				813F75D9B78D23D005A41F64 /* SwiftADB.app */,
 			);
 			name = Products;
@@ -100,6 +148,7 @@
 			children = (
 				1CE0424A790B9B930FAA9FA7 /* App */,
 				D4A6EFC048EC76B3A6FE46E3 /* Packages */,
+				3CE8B7788637407BBD5CE7E9 /* ScreenshotApp */,
 				B072A11F3D4C37553EE878EB /* Products */,
 			);
 			sourceTree = "<group>";
@@ -115,6 +164,25 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		497A33E61DFA6FF1FBC67A23 /* AndroidScreenshot */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = FBAE83ADD58413259AC14454 /* Build configuration list for PBXNativeTarget "AndroidScreenshot" */;
+			buildPhases = (
+				5DAEE6BDFCE3C8AA6C8BADA3 /* Sources */,
+				35AD8A7039AA1179F2B79A3C /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = AndroidScreenshot;
+			packageProductDependencies = (
+				4540490BDD5EE986531AB516 /* ADB */,
+			);
+			productName = AndroidScreenshot;
+			productReference = 5AECD35CBC9478E2E4AE675F /* AndroidScreenshot.app */;
+			productType = "com.apple.product-type.application";
+		};
 		6FCE95E738FE9A61DCD1A6D4 /* SwiftADB */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = ACE5B00C9C02D90150F96F7B /* Build configuration list for PBXNativeTarget "SwiftADB" */;
@@ -143,6 +211,10 @@
 				BuildIndependentTargetsInParallel = YES;
 				LastUpgradeCheck = 1430;
 				TargetAttributes = {
+					497A33E61DFA6FF1FBC67A23 = {
+						DevelopmentTeam = 7QU9C62CVX;
+						ProvisioningStyle = Automatic;
+					};
 					6FCE95E738FE9A61DCD1A6D4 = {
 						DevelopmentTeam = 7QU9C62CVX;
 						ProvisioningStyle = Automatic;
@@ -166,12 +238,29 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
+				497A33E61DFA6FF1FBC67A23 /* AndroidScreenshot */,
 				6FCE95E738FE9A61DCD1A6D4 /* SwiftADB */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXSourcesBuildPhase section */
+		5DAEE6BDFCE3C8AA6C8BADA3 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				590564DBE29AFCE6197A98CB /* AddDeviceSheet.swift in Sources */,
+				6894E6F710FCC7C1034AEA44 /* AuthApprovalView.swift in Sources */,
+				C3DB3A0B0E28B5BA93057DD5 /* ConnectionModel.swift in Sources */,
+				72727156069944055711496A /* ContentView.swift in Sources */,
+				8D6468EF2ECB63684502D87F /* DeviceDetailView.swift in Sources */,
+				71EACDC567CAC6D04B954CF5 /* DeviceListView.swift in Sources */,
+				CECEE7022CE81E9AE99FF6B4 /* DeviceStore.swift in Sources */,
+				DA8F9492A25E493641171A57 /* KeychainAuth.swift in Sources */,
+				6229EB58CD6639E3F9C366C8 /* ScreenshotApp.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		7CC54CC45B9DE424E2B5FD29 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -214,6 +303,26 @@
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
+		};
+		18E1B78ABF3171EE59E6C3CD /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = 7QU9C62CVX;
+				ENABLE_HARDENED_RUNTIME = YES;
+				INFOPLIST_FILE = Sources/ScreenshotApp/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				PRODUCT_BUNDLE_IDENTIFIER = soy.mdempsky.AndroidScreenshot;
+				SDKROOT = macosx;
+				SWIFT_VERSION = 5.9;
+			};
+			name = Release;
 		};
 		9B1AFA8AC4B8EC8539031F73 /* Release */ = {
 			isa = XCBuildConfiguration;
@@ -286,11 +395,11 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = iphoneos;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
@@ -343,15 +452,35 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = iphoneos;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
 				SWIFT_VERSION = 5.0;
 			};
 			name = Release;
+		};
+		CFEAB903A2EA20F3E832A163 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = 7QU9C62CVX;
+				ENABLE_HARDENED_RUNTIME = YES;
+				INFOPLIST_FILE = Sources/ScreenshotApp/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				PRODUCT_BUNDLE_IDENTIFIER = soy.mdempsky.AndroidScreenshot;
+				SDKROOT = macosx;
+				SWIFT_VERSION = 5.9;
+			};
+			name = Debug;
 		};
 /* End XCBuildConfiguration section */
 
@@ -374,6 +503,15 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;
 		};
+		FBAE83ADD58413259AC14454 /* Build configuration list for PBXNativeTarget "AndroidScreenshot" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				CFEAB903A2EA20F3E832A163 /* Debug */,
+				18E1B78ABF3171EE59E6C3CD /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
 /* End XCConfigurationList section */
 
 /* Begin XCLocalSwiftPackageReference section */
@@ -385,6 +523,10 @@
 
 /* Begin XCSwiftPackageProductDependency section */
 		2F3FA09CABBF9694F13D2959 /* ADB */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = ADB;
+		};
+		4540490BDD5EE986531AB516 /* ADB */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = ADB;
 		};
