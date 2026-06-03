@@ -2,25 +2,76 @@ import Foundation
 import Security
 import CryptoKit
 
-/// An object that provides RSA-2048 signing and public key material for ADB authentication.
+/// A type that provides RSA-2048 signing and public key material for ADB authentication.
+///
+/// ADB authenticates the host (your Mac or iPhone) to the device using an RSA-2048
+/// key pair. The device challenges the host with a random token; the host signs it
+/// and, if the device doesn't recognize the public key, presents the public key for
+/// the user to approve.
+///
+/// Implement this protocol to control how and where the key pair is stored. Common
+/// implementations use the macOS keychain (see `FileSystemAuth` in the CLI target)
+/// or the iOS Secure Enclave / Keychain (see `KeychainAuth` in the app target).
+///
+/// Use ``ADBPublicKey`` to convert a PKCS#1 DER public key into the formats this
+/// protocol requires.
 public protocol ADBAuthProvider: AnyObject {
-    /// Signs the 20-byte ADB token. Must use PKCS#1 v1.5 with SHA-1 treating the token
-    /// as a pre-computed digest (SecKeyAlgorithm .rsaSignatureDigestPKCS1v15SHA1).
+
+    /// Signs an ADB challenge token using PKCS#1 v1.5 with SHA-1.
+    ///
+    /// The `token` is a 20-byte value that the device sends during the AUTH
+    /// handshake. Sign it as a pre-hashed digest using
+    /// `SecKeyAlgorithm.rsaSignatureDigestPKCS1v15SHA1` (or an equivalent).
+    ///
+    /// - Parameter token: The 20-byte challenge token from the device.
+    /// - Returns: The PKCS#1 v1.5 RSA signature over `token`.
+    /// - Throws: Any error from the underlying signing operation (e.g., Keychain access denied).
     func sign(token: Data) throws -> Data
 
-    /// Returns the ADB public key wire bytes: base64(Montgomery struct) + " label\0".
+    /// Returns the ADB public key wire bytes.
+    ///
+    /// The format is: `base64(MontgomeryStruct) + " label\0"`, where
+    /// `MontgomeryStruct` is the 524-byte structure defined by the ADB protocol.
+    /// Use ``ADBPublicKey/authData(pkcs1DER:label:)`` to produce this from a
+    /// standard PKCS#1 DER-encoded RSA-2048 public key.
+    ///
+    /// - Returns: The public key payload to include in an `AUTH(RSAPUBLICKEY)` message.
+    /// - Throws: Any error from the underlying key retrieval operation.
     func publicKeyBytes() throws -> Data
 
-    /// Returns the MD5 fingerprint of the public key as "xx:xx:..." (matches Android display).
+    /// Returns the MD5 fingerprint of the public key for display to the user.
+    ///
+    /// The format is 16 lowercase hex pairs separated by colons (e.g.,
+    /// `"ab:cd:ef:..."`), matching the fingerprint Android shows in the
+    /// "Allow USB debugging?" dialog. Use ``ADBPublicKey/fingerprint(pkcs1DER:)``
+    /// to derive this from a PKCS#1 DER public key.
+    ///
+    /// - Returns: The 47-character colon-separated MD5 fingerprint string.
+    /// - Throws: Any error from the underlying key retrieval operation.
     func fingerprint() throws -> String
 }
 
-// MARK: - ADBPublicKey helpers (for use by ADBAuthProvider implementors)
+// MARK: - ADBPublicKey
 
-/// Utilities for encoding RSA-2048 public keys in ADB's Montgomery wire format.
+/// Utilities for encoding RSA-2048 public keys in the ADB wire format.
+///
+/// ADB represents public keys as a Montgomery-form struct base64-encoded with a
+/// label suffix — not as standard PEM or DER. This type converts a standard
+/// PKCS#1 DER-encoded RSA-2048 public key into that format.
+///
+/// These helpers are intended for use inside ``ADBAuthProvider`` implementations.
 public enum ADBPublicKey {
 
-    /// Encodes a PKCS#1 DER RSA-2048 public key into the ADB wire format (base64 of Montgomery struct).
+    /// Encodes a PKCS#1 DER RSA-2048 public key as the ADB Montgomery base64 string.
+    ///
+    /// The output is the base64 encoding of the 524-byte Montgomery struct that
+    /// ADB uses to verify signatures on the device side. This is the inner value
+    /// that ``authData(pkcs1DER:label:)`` and ``fingerprint(pkcs1DER:)`` build on.
+    ///
+    /// - Parameter pkcs1DER: A DER-encoded PKCS#1 RSA-2048 public key.
+    /// - Returns: The base64-encoded Montgomery struct, without line breaks.
+    /// - Throws: ``ADBError/protocolError(_:)`` if the key cannot be parsed or
+    ///   is not RSA-2048 (i.e., the modulus is not exactly 256 bytes).
     public static func encode(pkcs1DER: Data) throws -> String {
         let modulusLE = try extractModulusLE(der: pkcs1DER)
         guard modulusLE.count == 256 else {
@@ -36,13 +87,33 @@ public enum ADBPublicKey {
         return s.base64EncodedString()
     }
 
-    /// Returns the full AUTH(RSAPUBLICKEY) payload: base64(Montgomery struct) + " {label}\0"
+    /// Returns the full `AUTH(RSAPUBLICKEY)` payload for the given key and label.
+    ///
+    /// The payload is `base64(MontgomeryStruct) + " {label}\0"`. Pass the result
+    /// to ``ADBAuthProvider/publicKeyBytes()`` of your ``ADBAuthProvider``
+    /// implementation.
+    ///
+    /// - Parameters:
+    ///   - pkcs1DER: A DER-encoded PKCS#1 RSA-2048 public key.
+    ///   - label: A human-readable label appended to the key. Defaults to `"SwiftADB"`.
+    ///     Android displays this in the "Allow USB debugging?" dialog.
+    /// - Returns: The null-terminated UTF-8 payload bytes for an `AUTH(RSAPUBLICKEY)` message.
+    /// - Throws: ``ADBError/protocolError(_:)`` if the key cannot be parsed.
     public static func authData(pkcs1DER: Data, label: String = "SwiftADB") throws -> Data {
         let b64 = try encode(pkcs1DER: pkcs1DER)
         return Data((b64 + " \(label)\0").utf8)
     }
 
-    /// Returns the MD5 fingerprint of the encoded key as "xx:xx:..." (16 colon-separated hex pairs).
+    /// Returns the MD5 fingerprint of the encoded key as a colon-separated hex string.
+    ///
+    /// Produces the same fingerprint that Android displays in the
+    /// "Allow USB debugging?" dialog, e.g., `"ab:12:cd:34:..."`.
+    /// Pass the result to ``ADBAuthProvider/fingerprint()`` of your
+    /// ``ADBAuthProvider`` implementation.
+    ///
+    /// - Parameter pkcs1DER: A DER-encoded PKCS#1 RSA-2048 public key.
+    /// - Returns: 16 lowercase hex pairs joined by colons (47 characters total).
+    /// - Throws: ``ADBError/protocolError(_:)`` if the key cannot be parsed.
     public static func fingerprint(pkcs1DER: Data) throws -> String {
         let b64 = try encode(pkcs1DER: pkcs1DER)
         guard let keyBytes = Data(base64Encoded: b64) else {

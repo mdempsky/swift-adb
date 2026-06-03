@@ -1,10 +1,46 @@
 import Foundation
 import Network
 
+/// An active connection to an ADB daemon running on an Android device.
+///
+/// `ADBConnection` manages a TCP socket to `adbd`, performs the RSA authentication
+/// handshake, and multiplexes multiple ``ADBStream`` instances over the single
+/// connection. It is implemented as a Swift actor so all internal state is
+/// automatically protected from data races.
+///
+/// ## Lifecycle
+///
+/// 1. Create a connection with an ``ADBAuthProvider`` that supplies your RSA key.
+/// 2. Call ``connect(host:port:onProgress:)`` to establish the TCP connection and
+///    complete authentication. On the first connection from a new key, the device
+///    shows an "Allow USB debugging?" dialog; ``ConnectProgress/needsKeyApproval(fingerprint:)``
+///    is delivered so you can display the fingerprint to the user.
+/// 3. Open service streams with ``openStream(destination:)``.
+/// 4. Call ``disconnect()`` when done, or if an error occurs.
+///
+/// ## Example
+///
+/// ```swift
+/// let conn = ADBConnection(authProvider: myAuth)
+/// try await conn.connect(host: "10.0.0.1") { progress in
+///     if case .needsKeyApproval(let fp) = progress {
+///         print("Approve on device. Fingerprint: \(fp)")
+///     }
+/// }
+/// let installer = APKInstaller(connection: conn)
+/// let output = try await installer.shell("getprop ro.product.model")
+/// ```
 public actor ADBConnection {
 
+    /// Progress events delivered during ``connect(host:port:onProgress:)``.
     public enum ConnectProgress: Sendable {
+        /// The connection is established and authentication is in progress.
         case authenticating
+        /// The host's public key is not yet trusted by the device.
+        ///
+        /// The associated fingerprint matches the one displayed in the
+        /// "Allow USB debugging?" dialog on the device screen. Show it to the
+        /// user so they can verify they're approving the right host.
         case needsKeyApproval(fingerprint: String)
     }
 
@@ -13,20 +49,49 @@ public actor ADBConnection {
     private var pendingConnect: CheckedContinuation<Void, Error>?
     private var streams: [UInt32: ADBStream] = [:]
     private var nextLocalId: UInt32 = 1
+    private var lastHost: String?
+    private var lastPort: UInt16 = 5555
 
+    /// Creates a connection that uses the given provider for RSA authentication.
+    ///
+    /// - Parameter authProvider: The object that signs ADB challenge tokens and
+    ///   supplies the public key bytes. The connection holds a strong reference
+    ///   for its lifetime.
     public init(authProvider: any ADBAuthProvider) {
         self.authProvider = authProvider
     }
 
     // MARK: - Connect / Disconnect
 
-    /// Connects to an ADB daemon, authenticates, and returns the device model name.
+    /// Connects to an ADB daemon and authenticates, returning the device model name.
+    ///
+    /// This method establishes a TCP connection to `adbd` on the given host, performs
+    /// the ADB `CNXN`/`AUTH` handshake, and starts the message read loop. It suspends
+    /// until authentication completes or fails.
+    ///
+    /// On the first connection from a new RSA key, the device shows an
+    /// "Allow USB debugging?" dialog and this method suspends until the user responds.
+    /// Subsequent connections using the same key succeed immediately without user
+    /// interaction.
+    ///
+    /// - Parameters:
+    ///   - host: The hostname or IP address of the device running `adbd`.
+    ///   - port: The TCP port `adbd` is listening on. Defaults to `5555`,
+    ///     the standard ADB-over-TCP port.
+    ///   - onProgress: An optional closure called with progress events during
+    ///     the handshake. Called on an arbitrary thread.
+    /// - Returns: The device model name from the `CNXN` banner (e.g., `"Pixel 8"`),
+    ///   or an empty string if the banner does not include one.
+    /// - Throws: ``ADBError/connectionFailed(_:)`` if the TCP connection cannot be
+    ///   established, or ``ADBError/authFailed`` if the device rejects the key.
     @discardableResult
     public func connect(
         host: String,
         port: UInt16 = 5555,
         onProgress: (@Sendable (ConnectProgress) -> Void)? = nil
     ) async throws -> String {
+        lastHost = host
+        lastPort = port
         let endpoint = NWEndpoint.hostPort(
             host: NWEndpoint.Host(host),
             port: NWEndpoint.Port(rawValue: port)!
@@ -50,6 +115,11 @@ public actor ADBConnection {
         return deviceName
     }
 
+    /// Closes the connection and cancels all open streams.
+    ///
+    /// Any tasks suspended in ``ADBStream/read()`` or ``ADBStream/waitForOpen()``
+    /// on streams belonging to this connection will throw ``ADBError/streamClosed``.
+    /// It is safe to call this method more than once.
     public func disconnect() {
         conn?.cancel()
         conn = nil
@@ -58,8 +128,60 @@ public actor ADBConnection {
         pendingConnect = nil
     }
 
+    /// Disconnects and reconnects to the same host and port as the last ``connect(host:port:onProgress:)`` call.
+    ///
+    /// Use this after any operation that causes `adbd` to restart or the device to reboot —
+    /// specifically after ``APKInstaller/root()`` and ``APKInstaller/reboot(reason:)``.
+    /// Each attempt disconnects first, then retries ``connect(host:port:onProgress:)``; if the
+    /// device is not yet ready, the attempt fails and the next one begins after `retryDelay`.
+    ///
+    /// The default values (30 retries × 3 s) give a 90-second window, enough for both a fast
+    /// adbd restart (~2 s) and a full device reboot (~60 s).
+    ///
+    /// - Parameters:
+    ///   - retries: Maximum number of connection attempts. Defaults to `30`.
+    ///   - retryDelay: Pause between attempts. Defaults to `3` seconds.
+    ///   - onProgress: Optional closure forwarded to ``connect(host:port:onProgress:)``.
+    /// - Returns: The device model name from the `CNXN` banner.
+    /// - Throws: ``ADBError/connectionFailed(_:)`` if there is no prior connection or all
+    ///   attempts fail.
+    @discardableResult
+    public func reconnect(
+        retries: Int = 30,
+        retryDelay: Duration = .seconds(3),
+        onProgress: (@Sendable (ConnectProgress) -> Void)? = nil
+    ) async throws -> String {
+        guard let host = lastHost else {
+            throw ADBError.connectionFailed("no prior connection to reconnect to")
+        }
+        var lastError: Error = ADBError.connectionFailed("unknown")
+        for attempt in 0..<retries {
+            if attempt > 0 { try await Task.sleep(for: retryDelay) }
+            disconnect()
+            do { return try await connect(host: host, port: lastPort, onProgress: onProgress) }
+            catch { lastError = error }
+        }
+        throw lastError
+    }
+
     // MARK: - Streams
 
+    /// Opens a new stream to a named service on the device.
+    ///
+    /// Sends an ADB `OPEN` message for the given destination and waits for the
+    /// device to respond with `OKAY`. The returned stream is ready for I/O.
+    ///
+    /// Common destination strings:
+    /// - `"shell:<command>"` — run a shell command and stream its output.
+    /// - `"sync:"` — open the file sync service for push/pull operations.
+    /// - `"root:"` — restart `adbd` as root (userdebug builds only).
+    /// - `"remount:"` — remount `/system` read-write (userdebug builds only).
+    /// - `"reboot:"` — reboot the device.
+    ///
+    /// - Parameter destination: The ADB service name to connect to.
+    /// - Returns: An open ``ADBStream`` ready for reading and writing.
+    /// - Throws: ``ADBError/streamClosed`` if the connection is lost before
+    ///   the device acknowledges the stream.
     public func openStream(destination: String) async throws -> ADBStream {
         let localId = nextLocalId; nextLocalId += 1
         let stream = ADBStream(localId: localId, connection: self)
