@@ -8,7 +8,7 @@ class ConnectionModel: ObservableObject {
     }
 
     @Published private(set) var state: State = .disconnected
-    @Published private(set) var screenshot: NSImage?
+    @Published private(set) var screenshots: [NSImage] = []
     @Published private(set) var rsaFingerprint: String?
     @Published private(set) var deviceName: String?
     @Published private(set) var errorMessage: String?
@@ -29,7 +29,7 @@ class ConnectionModel: ObservableObject {
         if let c = conn { Task { await c.disconnect() } }
         conn = nil
         state = .disconnected
-        screenshot = nil
+        screenshots = []
         rsaFingerprint = nil
         deviceName = nil
         errorMessage = nil
@@ -43,7 +43,9 @@ class ConnectionModel: ObservableObject {
         do {
             let installer = APKInstaller(connection: conn)
             let data = try await installer.screencap()
-            screenshot = NSImage(data: data)
+            if let image = NSImage(data: data) {
+                screenshots.append(image)
+            }
             state = .connected
         } catch {
             errorMessage = error.localizedDescription

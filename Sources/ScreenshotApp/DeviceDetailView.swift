@@ -18,6 +18,21 @@ struct DeviceDetailView: View {
             .padding(32)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .toolbar {
+            if connection.isConnected {
+                ToolbarItem(placement: .primaryAction) {
+                    Button {
+                        Task { await connection.takeScreenshot() }
+                    } label: {
+                        Label(
+                            connection.isBusy ? "Capturing…" : "Take Screenshot",
+                            systemImage: "camera.fill"
+                        )
+                    }
+                    .disabled(connection.isBusy)
+                }
+            }
+        }
     }
 
     // MARK: - Status
@@ -75,52 +90,39 @@ struct DeviceDetailView: View {
 
     @ViewBuilder
     private var screenshotSection: some View {
-        VStack(spacing: 20) {
-            Button {
-                Task { await connection.takeScreenshot() }
-            } label: {
-                Label(
-                    connection.isBusy ? "Capturing…" : "Take Screenshot",
-                    systemImage: "camera.fill"
-                )
-                .frame(minWidth: 160)
-            }
-            .buttonStyle(.borderedProminent)
-            .controlSize(.large)
-            .disabled(connection.isBusy)
+        if connection.isBusy {
+            ProgressView()
+        }
 
-            if connection.isBusy {
-                ProgressView()
-            }
+        if let error = connection.errorMessage, !connection.isBusy {
+            Text(error)
+                .font(.callout)
+                .foregroundStyle(.red)
+        }
 
-            if let error = connection.errorMessage, !connection.isBusy {
-                Text(error)
-                    .font(.callout)
-                    .foregroundStyle(.red)
-            }
+        if connection.screenshots.isEmpty && !connection.isBusy {
+            Text("Click \"Take Screenshot\" to capture the Android screen.")
+                .foregroundStyle(.tertiary)
+                .font(.callout)
+        }
 
-            if let screenshot = connection.screenshot {
-                screenshotPreview(screenshot)
-            } else if !connection.isBusy {
-                Text("Click \"Take Screenshot\" to capture the Android screen.")
-                    .foregroundStyle(.tertiary)
-                    .font(.callout)
-            }
+        ForEach(connection.screenshots.indices.reversed(), id: \.self) { index in
+            screenshotPreview(connection.screenshots[index], index: index)
         }
     }
 
-    private func screenshotPreview(_ image: NSImage) -> some View {
+    private func screenshotPreview(_ image: NSImage, index: Int) -> some View {
         VStack(spacing: 12) {
             Image(nsImage: image)
                 .resizable()
                 .aspectRatio(contentMode: .fit)
-                .frame(maxWidth: 360)
+                .frame(maxWidth: .infinity, maxHeight: 400)
                 .cornerRadius(12)
                 .shadow(color: .black.opacity(0.2), radius: 8, y: 4)
-                .onDrag { makeDragProvider(for: image) }
+                .onDrag { makeDragProvider(for: image, index: index) }
 
             HStack(spacing: 12) {
-                Button("Save Screenshot…") { saveScreenshot(image) }
+                Button("Save Screenshot…") { saveScreenshot(image, index: index) }
                     .buttonStyle(.bordered)
                 Text("or drag to share")
                     .font(.caption)
@@ -129,23 +131,24 @@ struct DeviceDetailView: View {
         }
     }
 
-    private func makeDragProvider(for image: NSImage) -> NSItemProvider {
-        let url = FileManager.default.temporaryDirectory
-            .appendingPathComponent("screenshot.png")
+    private func makeDragProvider(for image: NSImage, index: Int) -> NSItemProvider {
+        let filename = connection.screenshots.count > 1 ? "screenshot-\(index + 1).png" : "screenshot.png"
+        let url = FileManager.default.temporaryDirectory.appendingPathComponent(filename)
         if let tiff = image.tiffRepresentation,
            let bitmap = NSBitmapImageRep(data: tiff),
            let png = bitmap.representation(using: .png, properties: [:]) {
             try? png.write(to: url)
         }
         let provider = NSItemProvider(object: url as NSURL)
-        provider.suggestedName = "screenshot.png"
+        provider.suggestedName = filename
         return provider
     }
 
-    private func saveScreenshot(_ image: NSImage) {
+    private func saveScreenshot(_ image: NSImage, index: Int) {
         let panel = NSSavePanel()
         panel.allowedContentTypes = [.png]
-        panel.nameFieldStringValue = "screenshot.png"
+        let filename = connection.screenshots.count > 1 ? "screenshot-\(index + 1).png" : "screenshot.png"
+        panel.nameFieldStringValue = filename
         panel.begin { response in
             guard response == .OK, let url = panel.url else { return }
             guard let tiff = image.tiffRepresentation,
