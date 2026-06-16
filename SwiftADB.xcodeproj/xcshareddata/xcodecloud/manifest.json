@@ -1,0 +1,9 @@
+{
+  "id" : "51d3719a-bddb-441b-8ef0-158bda19fbfc",
+  "targets" : [
+    {
+      "id" : "d8bf37ac-216e-47b1-bffe-e6d9ec6c0392",
+      "name" : "AndroidScreenshot"
+    }
+  ]
+}

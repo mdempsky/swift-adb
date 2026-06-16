@@ -43,3 +43,17 @@ targets:
         CODE_SIGN_STYLE: Automatic
         MACOSX_DEPLOYMENT_TARGET: "13.0"
         ENABLE_HARDENED_RUNTIME: YES
+
+schemes:
+  AndroidScreenshot:
+    build:
+      targets:
+        AndroidScreenshot: all
+    run:
+      config: Debug
+    profile:
+      config: Release
+    analyze:
+      config: Debug
+    archive:
+      config: Release
